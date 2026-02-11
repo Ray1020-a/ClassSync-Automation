@@ -11,7 +11,9 @@ import {
   Calendar,
   MapPin,
   Loader2,
-  Lock
+  Lock,
+  Trophy,
+  Link
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Cookies from "js-cookie";
@@ -160,8 +162,19 @@ export default function Dashboard() {
                 ))}
               </select>
             </div>
+            <button
+              onClick={() => router.push("/leaderboard")}
+              className="group flex items-center gap-2 bg-slate-100 hover:bg-amber-50 px-4 py-2.5 rounded-xl transition-all duration-300 active:scale-95 border border-transparent hover:border-amber-200">
+              <Trophy 
+                size={18} 
+                className="text-slate-400 group-hover:text-amber-500 group-hover:rotate-12 transition-all duration-300" 
+              />
+              <span className="text-sm font-bold text-slate-600 group-hover:text-amber-700 tracking-tight">
+                排行榜
+              </span>
+            </button>
           </div>
-
+          
           <div className="flex items-center gap-2">
             {/* 僅本人顯示同步按鈕 */}
             {isMyOwnSchedule ? (
