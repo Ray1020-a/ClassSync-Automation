@@ -303,7 +303,7 @@ export default function Dashboard() {
         {/* 頁尾資訊 */}
         <div className="mt-10 flex flex-col md:flex-row justify-between items-center text-slate-400 text-[11px] font-bold tracking-widest gap-6">
           <p>© 2026 ClassSync | AI assistance powered by Google Gemini</p>
-          <p>若發現任何錯誤，請聯絡</p>
+          <p>若發現任何錯誤，請聯絡 {process.env.NEXT_PUBLIC_ADMIN_EMAIL}</p>
         </div>
       </main>
     </div>
