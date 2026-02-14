@@ -16,7 +16,6 @@ import {
   Link
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import Cookies from "js-cookie";
 
 // 導入自定義工具與元件
 import { getAuthUser, removeAuthCookie } from "@/lib/auth";
@@ -76,28 +75,27 @@ export default function Dashboard() {
   // --- 同步至 ClassSync (只限本人) ---
   const handleSync = async () => {
     if (!isMyOwnSchedule) return;
-    alert("還是爛的，先不要用")
-    // if (!confirm("即將開始同步您的課表至 ClassSync 系統，這可能需要幾秒鐘的時間。確定繼續？")) return;
+    if (!confirm("即將開始同步您的課表至 ClassSync 系統，這可能需要幾秒鐘的時間。確定繼續？")) return;
 
-    // setIsSyncing(true);
-    // try {
-    //   const res = await fetch("/api/sync", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({ userId: loggedInId }),
-    //   });
+    setIsSyncing(true);
+    try {
+      const res = await fetch("/api/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: loggedInId }),
+      });
 
-    //   const result = await res.json();
-    //   if (res.ok) {
-    //     alert(`同步完成！\n成功將 ${result.syncedWeeks} 週的課表同步至 ClassSync。`);
-    //   } else {
-    //     alert(`同步失敗：${result.error}`);
-    //   }
-    // } catch (err) {
-    //   alert("無法連線至同步 API，請稍後再試。");
-    // } finally {
-    //   setIsSyncing(false);
-    // }
+      const result = await res.json();
+      if (res.ok) {
+        alert(`同步完成！\n成功將 ${result.syncedWeeks} 週的課表同步至 ClassSync。`);
+      } else {
+        alert(`同步失敗：${result.error}`);
+      }
+    } catch (err) {
+      alert("無法連線至同步 API，請稍後再試。");
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   // --- 渲染判斷 ---
