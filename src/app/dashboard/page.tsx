@@ -126,7 +126,7 @@ export default function Dashboard() {
               </div>
               <h3 className="text-xl font-black text-slate-800 tracking-tight">同步處理中</h3>
               <p className="text-slate-500 text-center mt-2 text-sm leading-relaxed">
-                請稍後，系統正在將您的課表同步至 ClassSync<br/>請勿關閉視窗
+                請稍後，系統正在運行<br/>請勿關閉視窗
               </p>
             </div>
           </motion.div>
