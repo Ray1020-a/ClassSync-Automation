@@ -222,7 +222,7 @@ export default function Dashboard() {
                 公告
               </span>
               <p className="text-sm font-bold tracking-tight">
-                學期初課程登陸期，若有任何問題請聯絡 {process.env.NEXT_PUBLIC_ADMIN_EMAIL}
+                學期初課程登陸期，若有錯誤請聯絡 {process.env.NEXT_PUBLIC_ADMIN_EMAIL}
               </p>
             </div>
           </div>
