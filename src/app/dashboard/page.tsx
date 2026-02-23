@@ -219,10 +219,13 @@ export default function Dashboard() {
             {/* 公告文字 */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
               <p className="text-sm font-bold tracking-tight">
-                學期初課程登陸期，若有錯誤請聯絡 {process.env.NEXT_PUBLIC_ADMIN_EMAIL}
+                學期初課程登陸期，若有錯誤請聯絡 {process.env.NEXT_PUBLIC_ADMIN_EMAIL}。本系統僅為輔助工具，資料以學校公告為準。
               </p>
             </div>
           </div>
+          <span className="hidden md:block text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">
+            上次課程更新: 2026-02-23 23:20
+          </span>
         </div>
       </div>
 
