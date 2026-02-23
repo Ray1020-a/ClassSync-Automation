@@ -218,9 +218,6 @@ export default function Dashboard() {
 
             {/* 公告文字 */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
-              <span className="bg-white text-black text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-tighter">
-                公告
-              </span>
               <p className="text-sm font-bold tracking-tight">
                 學期初課程登陸期，若有錯誤請聯絡 {process.env.NEXT_PUBLIC_ADMIN_EMAIL}
               </p>
