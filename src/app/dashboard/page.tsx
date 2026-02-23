@@ -199,6 +199,35 @@ export default function Dashboard() {
           </div>
         </div>
       </nav>
+      
+      <div className="bg-blue-600 shadow-inner">
+        <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between">
+          <div className="flex items-center gap-3 text-white">
+            {/* 閃爍的鈴鐺圖示 */}
+            <div className="bg-white/20 p-1.5 rounded-lg animate-pulse">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="16" height="16" 
+                viewBox="0 0 24 24" fill="none" 
+                stroke="currentColor" strokeWidth="3" 
+                strokeLinecap="round" strokeLinejoin="round"
+              >
+                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+              </svg>
+            </div>
+
+            {/* 公告文字 */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+              <span className="bg-white text-black text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-tighter">
+                公告
+              </span>
+              <p className="text-sm font-bold tracking-tight">
+                學期初課程登陸期，若有任何問題請聯絡 {process.env.NEXT_PUBLIC_ADMIN_EMAIL}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <main className="max-w-7xl mx-auto p-4 md:p-8">
         
