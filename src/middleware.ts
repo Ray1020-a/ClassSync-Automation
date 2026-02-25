@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 
 // --- 配置白名單 ---
 const PUBLIC_FILE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico'];
-const PUBLIC_PATHS = ['/login', '/api/auth/send-code', '/api/auth/verify'];
+const PUBLIC_PATHS = ['/login', '/api/auth/send-code', '/api/auth/verify', '/api/public/sync'];
 
 const textEncoder = new TextEncoder();
 
