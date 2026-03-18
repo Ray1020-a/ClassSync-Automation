@@ -224,7 +224,7 @@ export default function Dashboard() {
             </div>
           </div>
           <span className="hidden md:block text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">
-            上次課程更新: 2026-03-05 20:05
+            上次課程更新: 2026-03-18 23:38
           </span>
         </div>
       </div>
