@@ -7,19 +7,26 @@ import { getWeekDays, parseSections } from '@/lib/scheduleUtils';
 const SECRET = process.env.AUTH_SECRET || 'fallback';
 const SCHOOL_NAME = "臺北市數位實驗高級中等學校";
 
-/**
- * 伺服器端驗證簽章邏輯 (手動實作以確保與 Middleware 一致)
- */
+// 1~8 節時間對照表
+const TIME_TABLE: Record<number, { period: string; start: string; end: string }> = {
+  1: { period: "一", start: "08:25", end: "09:15" },
+  2: { period: "二", start: "09:15", end: "10:05" },
+  3: { period: "三", start: "10:15", end: "11:05" },
+  4: { period: "四", start: "11:05", end: "11:55" },
+  5: { period: "五", start: "13:25", end: "14:15" },
+  6: { period: "六", start: "14:15", end: "15:05" },
+  7: { period: "七", start: "15:15", end: "16:05" },
+  8: { period: "八", start: "16:05", end: "16:55" },
+};
+
+// 星期對照表
+const WEEKDAY_NAMES = ["日", "一", "二", "三", "四", "五", "六"];
+
 function verifyToken(session: string): string | null {
   try {
     const decoded = Buffer.from(session, 'base64').toString();
     const [userId, signature] = decoded.split('.');
-    
-    const expectedSignature = crypto
-      .createHmac('sha256', SECRET)
-      .update(userId)
-      .digest('hex');
-
+    const expectedSignature = crypto.createHmac('sha256', SECRET).update(userId).digest('hex');
     return signature === expectedSignature ? userId : null;
   } catch {
     return null;
@@ -34,57 +41,64 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: '缺少 user_session 參數' }, { status: 400 });
   }
 
-  // 1. 驗證 Session 簽章是否正確
   const userId = verifyToken(session);
   if (!userId) {
     return NextResponse.json({ error: '無效的會話或簽章錯誤' }, { status: 401 });
   }
 
   try {
-    // 2. 讀取資料庫
-    const classPath = path.join(process.cwd(), 'src/data/class.json');
-    const studentPath = path.join(process.cwd(), 'src/data/student.json');
-    const classData = JSON.parse(fs.readFileSync(classPath, 'utf8'));
-    const studentData = JSON.parse(fs.readFileSync(studentPath, 'utf8'));
+    const classData = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'src/data/class.json'), 'utf8'));
+    const studentData = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'src/data/student.json'), 'utf8'));
 
     const studentInfo = studentData[userId];
     if (!studentInfo) {
       return NextResponse.json({ error: '找不到該學生資料' }, { status: 404 });
     }
 
-    // 3. 獲取當週日期 (Monday to Friday)
+    // 取得本週日期陣列 (YYYY-MM-DD)
     const currentWeekDates = getWeekDays(0); 
+    const scheduleByCourse: Record<string, any> = {};
 
-    // 4. 建立當週課表結構
-    const weeklySchedule: Record<string, any> = {};
-    
-    currentWeekDates.forEach((date) => {
-      weeklySchedule[date] = {};
-      
-      // 檢查該學生修的所有課程
-      studentInfo.class.forEach((className: string) => {
-        const schedules = classData[className] || [];
-        
-        schedules.forEach((sche: any) => {
-          if (sche.Time === date) {
-            const sections = parseSections(sche.Section);
-            sections.forEach(s => {
-              // 初始化該節次的陣列 (考慮到衝堂)
-              if (!weeklySchedule[date][s]) weeklySchedule[date][s] = [];
-              
-              weeklySchedule[date][s].push({
-                courseName: className,
-                location: sche.Location,
-                base: sche.Location.split('_')[0],
-                room: sche.Location.split('_')[1] || ""
+    // 遍歷學生所修的所有課程
+    studentInfo.class.forEach((courseName: string) => {
+      const courseEvents = classData[courseName] || [];
+      const relevantSchedules: any[] = [];
+
+      courseEvents.forEach((event: any) => {
+        // 只處理發生在本週內的課程日期
+        if (currentWeekDates.includes(event.Time)) {
+          const dateObj = new Date(event.Time);
+          const weekdayName = WEEKDAY_NAMES[dateObj.getDay()]; // 取得 "一" 到 "五"
+          
+          const sections = parseSections(event.Section);
+          sections.forEach((s: number) => {
+            const timeInfo = TIME_TABLE[s];
+            if (timeInfo) {
+              relevantSchedules.push({
+                weekday: weekdayName,
+                period: timeInfo.period,
+                start: timeInfo.start,
+                end: timeInfo.end
               });
-            });
-          }
-        });
+            }
+          });
+        }
       });
+
+      // 如果本週有課，才加入回傳結果
+      if (relevantSchedules.length > 0) {
+        scheduleByCourse[courseName] = {
+          count: relevantSchedules.length,
+          schedule: relevantSchedules.sort((a, b) => {
+            // 排序邏輯：先排星期，再排節次
+            const dayMap: any = { "一": 1, "二": 2, "三": 3, "四": 4, "五": 5 };
+            const periodMap: any = { "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8 };
+            return dayMap[a.weekday] - dayMap[b.weekday] || periodMap[a.period] - periodMap[b.period];
+          })
+        };
+      }
     });
 
-    // 5. 回傳完整 JSON
     return NextResponse.json({
       success: true,
       data: {
@@ -93,13 +107,13 @@ export async function GET(request: Request) {
         school: SCHOOL_NAME,
         currentWeek: {
           range: `${currentWeekDates[0]} ~ ${currentWeekDates[4]}`,
-          schedule: weeklySchedule
+          courses: scheduleByCourse
         }
       }
     });
 
   } catch (error) {
-    console.error("Public User Info API Error:", error);
+    console.error("User Info API Error:", error);
     return NextResponse.json({ error: '伺服器內部錯誤' }, { status: 500 });
   }
 }
